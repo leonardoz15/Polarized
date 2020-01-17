@@ -1,4 +1,5 @@
 import re
+import json
 import tweepy
 from tweepy import OAuthHandler
 from textblob import TextBlob
@@ -11,11 +12,13 @@ class TwitterClient(object):
 		'''
 		Class constructor or initialization method.
 		'''
-		# keys and tokens from the Twitter Dev Console
-		consumer_key = 'XXXXXXXXXXXXXXXXXXXXXXXX'
-		consumer_secret = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-		access_token = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-		access_token_secret = 'XXXXXXXXXXXXXXXXXXXXXXXXX'
+		# Twitter Dev Console credentials in client.json
+		client = json.loads('../secret/client.json')
+		# keys and tokens from the client.json
+		consumer_key = client["consumer_key"]
+		consumer_secret = client["consumer_key_secret"]
+		access_token = client["access_token"]
+		access_token_secret = client["access_token_secret"]
 
 		# attempt authentication
 		try:
