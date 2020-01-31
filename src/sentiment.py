@@ -55,16 +55,16 @@ class TwitterClient(object):
 		else:
 			return 'negative'
 
-	def get_tweets(self, query, count = 10):
+	def get_user_tweets(self, user_id, count):
 		'''
-		Main function to fetch tweets and parse them.
+		Main function to fetch tweets from a user and parse them.
 		'''
 		# empty list to store parsed tweets
 		tweets = []
 
 		try:
 			# call twitter api to fetch tweets
-			fetched_tweets = self.api.search(q = query, count = count)
+			fetched_tweets = self.api.user_timeline(user_id = user_id, count = count)
 
 			# parsing tweets one by one
 			for tweet in fetched_tweets:
@@ -72,7 +72,7 @@ class TwitterClient(object):
 				parsed_tweet = {}
 
 				# saving text of tweet
-				parsed_tweet['text'] = tweet.text
+				parsed_tweet['text'] = self.clean_tweet(tweet.text)
 				# saving sentiment of tweet
 				parsed_tweet['sentiment'] = self.get_tweet_sentiment(tweet.text)
 
@@ -91,11 +91,33 @@ class TwitterClient(object):
 			# print error (if any)
 			print("Error : " + str(e))
 
+	def search_for_user(self, screen_name, count):
+		'''
+		Verifies that searched user exists
+		'''
+		# list to store user objects in
+		users = []
+		# search Twitter for specified screen_name
+		user = self.api.search_users(q = screen_name, count = count)
+
+
+		if len(user) != 0:
+			inspect_user = user[0]
+			real_id = inspect_user.id
+			print("Found user: ", inspect_user.screen_name)
+			print("User id: ", real_id)
+			return real_id
+		else:
+			print("No user with that name")
+
+
 def main():
 	# creating object of TwitterClient Class
 	api = TwitterClient()
+	# checking if user exists - seperate method?
+	user = api.search_for_user(screen_name = 'Donald J. Trump', count = 1)
 	# calling function to get tweets
-	tweets = api.get_tweets(query = 'Donald Trump', count = 200)
+	tweets = api.get_user_tweets(user_id = user, count = 100)
 
 	# picking positive tweets from tweets
 	ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
@@ -111,12 +133,12 @@ def main():
 	# printing first 5 positive tweets
 	print("\n\nPositive tweets:")
 	for tweet in ptweets[:10]:
-		print(tweet['text'])
+		print(tweet['text'].encode("utf-8"))
 
 	# printing first 5 negative tweets
 	print("\n\nNegative tweets:")
 	for tweet in ntweets[:10]:
-		print(tweet['text'])
+		print(tweet['text'].encode("utf-8"))
 
 if __name__ == "__main__":
 	# calling main function
