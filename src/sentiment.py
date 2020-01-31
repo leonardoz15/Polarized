@@ -100,7 +100,7 @@ class TwitterClient(object):
 		# search Twitter for specified screen_name
 		user = self.api.search_users(q = screen_name, count = count)
 
-
+		# Verifies query is successful
 		if len(user) != 0:
 			inspect_user = user[0]
 			real_id = inspect_user.id
