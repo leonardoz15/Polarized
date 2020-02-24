@@ -115,9 +115,9 @@ def main():
 	# creating object of TwitterClient Class
 	api = TwitterClient()
 	# checking if user exists - seperate method?
-	user = api.search_for_user(screen_name = 'Donald J. Trump', count = 1)
+	user = api.search_for_user(screen_name = 'Donald Trump', count = 1)
 	# calling function to get tweets
-	tweets = api.get_user_tweets(user_id = user, count = 100)
+	tweets = api.get_user_tweets(user_id = user, count = 200)
 
 	# picking positive tweets from tweets
 	ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
