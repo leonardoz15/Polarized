@@ -2,6 +2,7 @@ import sklearn
 from sklearn import svm
 from sklearn import datasets
 from sklearn import metrics
+from sklearn.metrics import classification_report
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -66,7 +67,7 @@ tfidf_transformer = TfidfTransformer()
 X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
 
 
-string = "Communist Obama uses people to push his communist agenda in the background!!!"
+string = "Pizza"
 print("String to test :\n", string)
 
 print("Testing with multinomial NB:")
@@ -84,6 +85,8 @@ print(clf2.predict(count_vect.transform([string])))
 
 y_predict = clf.predict(count_vect.transform(X_test))
 y_predict2 = clf2.predict(count_vect.transform(X_test))
+
+print(classification_report(y_test, clf2.predict(count_vect.transform(X_test))))
 
 accNB = metrics.accuracy_score(y_test, y_predict)
 accSVM = metrics.accuracy_score(y_test, y_predict2)
