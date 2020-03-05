@@ -4,41 +4,15 @@ import tweepy
 from tweepy import OAuthHandler
 from textblob import TextBlob
 
-class TwitterClient(object):
+class PoliticalClassification(object):
 	'''
-	Generic Twitter Class for sentiment analysis.
+	Class to handle sentiment and political classification
 	'''
 	def __init__(self):
 		'''
 		Class constructor or initialization method.
 		'''
-		# Twitter Dev Console credentials in client.json
-		with open ("../secret/client.json") as f:
-			client = json.load(f)
-		# keys and tokens from the client.json
-		consumer_key = client["consumer_key"]
-		consumer_secret = client["consumer_key_secret"]
-		access_token = client["access_token"]
-		access_token_secret = client["access_token_secret"]
 
-
-		# attempt authentication
-		try:
-			# create OAuthHandler object
-			self.auth = OAuthHandler(consumer_key, consumer_secret)
-			# set access token and secret
-			self.auth.set_access_token(access_token, access_token_secret)
-			# create tweepy API object to fetch tweets
-			self.api = tweepy.API(self.auth)
-		except:
-			print("Error: Authentication Failed")
-
-	def clean_tweet(self, tweet):
-		'''
-		Utility function to clean tweet text by removing links, special characters
-		using simple regex statements.
-		'''
-		return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())
 
 	def get_tweet_sentiment(self, tweet):
 		'''
@@ -55,91 +29,28 @@ class TwitterClient(object):
 		else:
 			return 'negative'
 
-	def get_user_tweets(self, user_id, count):
+	def classify_user(self,tweets):
 		'''
-		Main function to fetch tweets from a user and parse them.
+		Classify user based on each tweet ratio -1 to 1
 		'''
-		# empty list to store parsed tweets
-		tweets = []
 
-		try:
-			# call twitter api to fetch tweets
-			fetched_tweets = self.api.user_timeline(user_id = user_id, count = count)
-
-			# parsing tweets one by one
-			for tweet in fetched_tweets:
-				# empty dictionary to store required params of a tweet
-				parsed_tweet = {}
-
-				# saving text of tweet
-				parsed_tweet['text'] = self.clean_tweet(tweet.text)
-				# saving sentiment of tweet
-				parsed_tweet['sentiment'] = self.get_tweet_sentiment(tweet.text)
-
-				# appending parsed tweet to tweets list
-				if tweet.retweet_count > 0:
-					# if tweet has retweets, ensure that it is appended only once
-					if parsed_tweet not in tweets:
-						tweets.append(parsed_tweet)
-				else:
-					tweets.append(parsed_tweet)
-
-			# return parsed tweets
-			return tweets
-
-		except tweepy.TweepError as e:
-			# print error (if any)
-			print("Error : " + str(e))
-
-	def search_for_user(self, screen_name, count):
-		'''
-		Verifies that searched user exists
-		'''
-		# list to store user objects in
-		users = []
-		# search Twitter for specified screen_name
-		user = self.api.search_users(q = screen_name, count = count)
-
-		# Verifies query is successful
-		if len(user) != 0:
-			inspect_user = user[0]
-			real_id = inspect_user.id
-			print("Found user: ", inspect_user.screen_name)
-			print("User id: ", real_id)
-			return real_id
-		else:
-			print("No user with that name")
-
-
-def main():
-	# creating object of TwitterClient Class
-	api = TwitterClient()
-	# checking if user exists - seperate method?
-	user = api.search_for_user(screen_name = 'Donald Trump', count = 1)
-	# calling function to get tweets
-	tweets = api.get_user_tweets(user_id = user, count = 200)
-
-	# picking positive tweets from tweets
-	ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
-	# percentage of positive tweets
-	print("Positive tweets percentage: {} %".format(100*len(ptweets)/len(tweets)))
-	# picking negative tweets from tweets
-	ntweets = [tweet for tweet in tweets if tweet['sentiment'] == 'negative']
-	# percentage of negative tweets
-	print("Negative tweets percentage: {} %".format(100*len(ntweets)/len(tweets)))
-	# percentage of neutral tweets
-	print("Neutral tweets percentage: {} %".format(100*(len(tweets) - len(ntweets) - len(ptweets))/len(tweets)))
-
-	# printing first 5 positive tweets
-	print("\n\nPositive tweets:")
-	for tweet in ptweets[:10]:
-		print(tweet['text'].encode("utf-8"))
-
-	# printing first 5 negative tweets
-	print("\n\nNegative tweets:")
-	for tweet in ntweets[:10]:
-		print(tweet['text'].encode("utf-8"))
-
-if __name__ == "__main__":
-	# calling main function
-	main()
+# # picking positive tweets from tweets
+# ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
+# # percentage of positive tweets
+# print("Positive tweets percentage: {} %".format(100*len(ptweets)/len(tweets)))
+# # picking negative tweets from tweets
+# ntweets = [tweet for tweet in tweets if tweet['sentiment'] == 'negative']
+# # percentage of negative tweets
+# print("Negative tweets percentage: {} %".format(100*len(ntweets)/len(tweets)))
+# # percentage of neutral tweets
+# print("Neutral tweets percentage: {} %".format(100*(len(tweets) - len(ntweets) - len(ptweets))/len(tweets)))
+#
+# # printing first 5 positive tweets
+# print("\n\nPositive tweets:")
+# for tweet in ptweets[:10]:
+# 	print(tweet['text'].encode("utf-8"))
+#
+# # printing first 5 negative tweets
+# print("\n\nNegative tweets:")
+# for tweet in ntweets[:10]:
+# 	print(tweet['text'].encode("utf-8"))
