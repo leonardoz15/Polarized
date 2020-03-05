@@ -9,7 +9,7 @@ import pandas as pd
 
 class TrainingML(object):
     '''
-    Class for handling of both supervised models
+    Class for handling of both supervised learning models
     '''
     def __init__(self):
         '''
