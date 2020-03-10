@@ -41,8 +41,8 @@ def main():
             else:
                 right.append(tweet)
 
-    pleft = 100*len(left)/len(political_tweets)
-    pright = 100*len(right)/len(political_tweets)
+    pleft = (100*len(left)/len(political_tweets))
+    pright = (100*len(right)/len(political_tweets))
     print("Percent left leaning tweets {} %".format(pleft))
     print("Percent right leaning tweets {} %".format(pright))
 
@@ -55,10 +55,13 @@ def main():
             trained_model.get_classification_report_SVM()
         if len(right) != 0:
             print("Right leaning tweets:\n")
-            print(right['text'])
+            for tweet in right:
+                print(tweet['text'])
+                print(tweet['classification'])
         elif len(left) != 0:
             print("Left leaning tweets:\n")
-            print(left['text'])
+            for tweet in left:
+                print(tweet['text'])
 
     else:
         print("Have a nice day :)")

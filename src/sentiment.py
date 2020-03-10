@@ -17,17 +17,11 @@ class PoliticalClassification(object):
 				representatives = rep_tweets.drop(columns='Tweet')
 				representatives = representatives.drop_duplicates()
 
-				# senators = pd.read_csv("../data/senators.csv")
-				# senators.columns = ['Handle', 'Party']
-
 				# dictionary to store politcians and their party
-				# self.politicians = pd.concat([representatives, senators], ignore_index=True, sort=True)
-				# self.politicians.set_index('Handle').T.to_dict('list')
 				self.politicians = representatives.to_dict('records')
-				for entry in self.politicians:
-					print(entry)
-				# print(self.politicians['Party'].get("RepDarrenSoto"))
-				# print(self.politicians.loc["RepDarrenSoto","Party"])
+				# for entry in self.politicians:
+				# 	if "SenWarren" in entry['Handle']:
+				# 		print(entry['Party'])
 
 		def get_nouns(self, blob):
 				'''
@@ -49,6 +43,7 @@ class PoliticalClassification(object):
 				blob.correct()
 				# float to hold polarity of tweet
 				polarity = blob.polarity
+				print(polarity)
 
 				noun_list = self.get_nouns(blob)
 
@@ -62,16 +57,20 @@ class PoliticalClassification(object):
 				'''
 				# -1 = left leaning, 0 = neutral, 1 = right leaning
 				tweet_ratio = 0
-				party = self.politicians.get_value('SenWarren', 'Party')
-				print(party)
 				for noun in nouns:
-					if noun in self.politicians['Handle']:
-						party = list(map(itemgetter(noun), self.politicians['Party']))
-						if polarity > 0 and party == 'Democrat':
-							tweet_ratio = -1
-							return tweet_ratio
-						elif polarity > 0 and party == 'Republican':
-							tweet_ratio = 1
-							return tweet_ratio
-					else:
-						return 0
+					for entry in self.politicians:
+						if noun in entry['Handle']:
+							party = entry['Party']
+							if polarity > 0 and party == 'Democrat':
+								tweet_ratio = -1
+								return tweet_ratio
+							elif polarity > 0 and party == 'Republican':
+								tweet_ratio = 1
+								return tweet_ratio
+							elif polarity < 0 and party == 'Democrat':
+								tweet_ratio = 1
+								return tweet_ratio
+							elif polarity < 0 and party == 'Republican':
+								tweet_ratio = -1
+						else:
+							return 0
