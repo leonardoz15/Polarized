@@ -43,7 +43,6 @@ class PoliticalClassification(object):
 				blob.correct()
 				# float to hold polarity of tweet
 				polarity = blob.polarity
-				print(polarity)
 
 				noun_list = self.get_nouns(blob)
 
@@ -72,5 +71,6 @@ class PoliticalClassification(object):
 								return tweet_ratio
 							elif polarity < 0 and party == 'Republican':
 								tweet_ratio = -1
+								return tweet_ratio
 						else:
 							return 0
