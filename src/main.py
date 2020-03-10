@@ -55,11 +55,11 @@ def main():
             trained_model.get_classification_report_SVM()
         if len(right) != 0:
             print("Right leaning tweets:\n")
-            print(right)
+            print(right['text'])
         elif len(left) != 0:
             print("Left leaning tweets:\n")
-            print(left)
-            
+            print(left['text'])
+
     else:
         print("Have a nice day :)")
 

@@ -1,6 +1,7 @@
 import nltk
 from textblob import TextBlob
 import pandas as pd
+from operator import itemgetter
 
 class PoliticalClassification(object):
 		'''
@@ -11,13 +12,22 @@ class PoliticalClassification(object):
 				Class constructor, initializes dictionary for political classification
 				'''
 
-				polar_tweets = pd.read_csv("../data/ExtractedTweets.csv", header='infer')
-				polar_tweets.columns = ['Party', 'Handle', 'Tweet']
-				polar_tweets = polar_tweets.drop(columns='Tweet')
+				rep_tweets = pd.read_csv("../data/ExtractedTweets2.csv", header='infer')
+				rep_tweets.columns = ['Party', 'Handle', 'Tweet']
+				representatives = rep_tweets.drop(columns='Tweet')
+				representatives = representatives.drop_duplicates()
 
-				# dictionary to store politcians and their party of size 433 x 2
-				self.politicians = polar_tweets.drop_duplicates()
-				self.politicians.set_index('Handle').T.to_dict('list')
+				# senators = pd.read_csv("../data/senators.csv")
+				# senators.columns = ['Handle', 'Party']
+
+				# dictionary to store politcians and their party
+				# self.politicians = pd.concat([representatives, senators], ignore_index=True, sort=True)
+				# self.politicians.set_index('Handle').T.to_dict('list')
+				self.politicians = representatives.to_dict('records')
+				for entry in self.politicians:
+					print(entry)
+				# print(self.politicians['Party'].get("RepDarrenSoto"))
+				# print(self.politicians.loc["RepDarrenSoto","Party"])
 
 		def get_nouns(self, blob):
 				'''
@@ -52,9 +62,11 @@ class PoliticalClassification(object):
 				'''
 				# -1 = left leaning, 0 = neutral, 1 = right leaning
 				tweet_ratio = 0
+				party = self.politicians.get_value('SenWarren', 'Party')
+				print(party)
 				for noun in nouns:
 					if noun in self.politicians['Handle']:
-						party = self.politicians.get(noun)
+						party = list(map(itemgetter(noun), self.politicians['Party']))
 						if polarity > 0 and party == 'Democrat':
 							tweet_ratio = -1
 							return tweet_ratio
