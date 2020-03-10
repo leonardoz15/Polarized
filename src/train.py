@@ -34,14 +34,14 @@ class TrainingML(object):
         # Target = subject
         y = data["subject"]
         # Split into training and testing sets, and fit model
-        X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(x, y, test_size = 0.2)
+        X_train, self.X_test, y_train, self.y_test = sklearn.model_selection.train_test_split(x, y, test_size = 0.2)
         X_train_tfidf = self.tfidf.fit_transform(X_train)
         # Multinomial Naive Bayes
-        clf = MultinomialNB().fit(X_train_tfidf, y_train)
+        self.clf = MultinomialNB().fit(X_train_tfidf, y_train)
 
         #get_classification_report(clf)
 
-        return clf
+        return self.clf
 
     def trainingSVM(self, data):
         '''
@@ -52,13 +52,13 @@ class TrainingML(object):
         # Target = subject
         y = data["subject"]
         # Split into training and testing sets, and fit model
-        X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(x, y, test_size = 0.2)
+        X_train, self.X_test, y_train, self.y_test = sklearn.model_selection.train_test_split(x, y, test_size = 0.2)
         X_train_tfidf = self.tfidf.fit_transform(X_train)
         # Linear SVM with regulization parameter
-        clf = svm.SVC(kernel="linear", C=2)
-        clf.fit(X_train_tfidf, y_train)
+        self.clf = svm.SVC(kernel="linear", C=2)
+        self.clf.fit(X_train_tfidf, y_train)
 
-        return clf
+        return self.clf
 
     def predict_and_label(self, tweet, option):
         '''
@@ -74,11 +74,21 @@ class TrainingML(object):
 
         return tweet
 
-    def get_classification_report(self, clf):
+    def get_classification_report_NB(self):
         '''
         Utility function for generating a classification report for specified model
         '''
-        print(classification_report(y_test, clf.predict(tfidf.transform(X_test))))
+
+        print(classification_report(self.y_test, self.clf_NB.predict(self.tfidf.transform(self.X_test))))
+
+
+    def get_classification_report_SVM(self):
+        '''
+        Utility function for generating a classification report for specified model
+        '''
+
+        print(classification_report(self.y_test, self.clf_SVM.predict(self.tfidf.transform(self.X_test))))
+
 
 # y_predict = clf.predict(count_vect.transform(X_test))
 # y_predict2 = clf2.predict(count_vect.transform(X_test))
