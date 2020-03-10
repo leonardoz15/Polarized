@@ -1,56 +1,76 @@
-import re
-import json
-import tweepy
-from tweepy import OAuthHandler
+import nltk
 from textblob import TextBlob
+import pandas as pd
+from operator import itemgetter
 
 class PoliticalClassification(object):
-	'''
-	Class to handle sentiment and political classification
-	'''
-	def __init__(self):
 		'''
-		Class constructor or initialization method.
+		Class to handle sentiment and political classification
 		'''
+		def __init__(self):
+				'''
+				Class constructor, initializes dictionary for political classification
+				'''
 
+				rep_tweets = pd.read_csv("../data/ExtractedTweets2.csv", header='infer')
+				rep_tweets.columns = ['Party', 'Handle', 'Tweet']
+				representatives = rep_tweets.drop(columns='Tweet')
+				representatives = representatives.drop_duplicates()
 
-	def get_tweet_sentiment(self, tweet):
-		'''
-		Utility function to classify sentiment of passed tweet
-		using textblob's sentiment method
-		'''
-		# create TextBlob object of passed tweet text
-		analysis = TextBlob(self.clean_tweet(tweet))
-		# set sentiment
-		if analysis.sentiment.polarity > 0:
-			return 'positive'
-		elif analysis.sentiment.polarity == 0:
-			return 'neutral'
-		else:
-			return 'negative'
+				# dictionary to store politcians and their party
+				self.politicians = representatives.to_dict('records')
+				# for entry in self.politicians:
+				# 	if "SenWarren" in entry['Handle']:
+				# 		print(entry['Party'])
 
-	def classify_user(self,tweets):
-		'''
-		Classify user based on each tweet ratio -1 to 1
-		'''
+		def get_nouns(self, blob):
+				'''
+				Utility function to classify sentiment of passed tweet
+				using textblob's sentiment method
+				'''
 
-# # picking positive tweets from tweets
-# ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
-# # percentage of positive tweets
-# print("Positive tweets percentage: {} %".format(100*len(ptweets)/len(tweets)))
-# # picking negative tweets from tweets
-# ntweets = [tweet for tweet in tweets if tweet['sentiment'] == 'negative']
-# # percentage of negative tweets
-# print("Negative tweets percentage: {} %".format(100*len(ntweets)/len(tweets)))
-# # percentage of neutral tweets
-# print("Neutral tweets percentage: {} %".format(100*(len(tweets) - len(ntweets) - len(ptweets))/len(tweets)))
-#
-# # printing first 5 positive tweets
-# print("\n\nPositive tweets:")
-# for tweet in ptweets[:10]:
-# 	print(tweet['text'].encode("utf-8"))
-#
-# # printing first 5 negative tweets
-# print("\n\nNegative tweets:")
-# for tweet in ntweets[:10]:
-# 	print(tweet['text'].encode("utf-8"))
+				return blob.noun_phrases
+
+		def get_tweet_sentiment(self, tweet):
+				'''
+				Utility function to classify sentiment of passed tweet
+				using textblob's sentiment method
+				'''
+
+				# create TextBlob object of passed tweet text
+				blob = TextBlob(tweet)
+				# attempt spelling correction
+				blob.correct()
+				# float to hold polarity of tweet
+				polarity = blob.polarity
+				print(polarity)
+
+				noun_list = self.get_nouns(blob)
+
+				ratio = self.classify_tweet(polarity, noun_list)
+
+				return ratio
+
+		def classify_tweet(self, polarity, nouns):
+				'''
+				Classify user based on each tweet ratio -1 to 1
+				'''
+				# -1 = left leaning, 0 = neutral, 1 = right leaning
+				tweet_ratio = 0
+				for noun in nouns:
+					for entry in self.politicians:
+						if noun in entry['Handle']:
+							party = entry['Party']
+							if polarity > 0 and party == 'Democrat':
+								tweet_ratio = -1
+								return tweet_ratio
+							elif polarity > 0 and party == 'Republican':
+								tweet_ratio = 1
+								return tweet_ratio
+							elif polarity < 0 and party == 'Democrat':
+								tweet_ratio = 1
+								return tweet_ratio
+							elif polarity < 0 and party == 'Republican':
+								tweet_ratio = -1
+						else:
+							return 0
