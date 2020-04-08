@@ -34,12 +34,15 @@ def main():
 
     left = []
     right = []
+    center = []
     for tweet in political_tweets:
-        if tweet['classification'] != 0:
+        if tweet['classification'] != 'None':
             if tweet['classification'] == -1:
                 left.append(tweet)
-            else:
+            elif tweet['classification'] == 1:
                 right.append(tweet)
+            elif tweet['classification'] == 0:
+                center.append(tweet)
 
     pleft = (100*len(left)/len(political_tweets))
     pright = (100*len(right)/len(political_tweets))
@@ -61,6 +64,10 @@ def main():
         elif len(left) != 0:
             print("Left leaning tweets:\n")
             for tweet in left:
+                print(tweet['text'])
+        elif len(center) != 0:
+            print("Center or undefined tweets:\n")
+            for tweet in center:
                 print(tweet['text'])
 
     else:

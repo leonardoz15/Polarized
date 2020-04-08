@@ -54,7 +54,7 @@ class PoliticalClassification(object):
 				'''
 				Classify user based on each tweet ratio -1 to 1
 				'''
-				# -1 = left leaning, 0 = neutral, 1 = right leaning
+				# -1 = left leaning, 0 = neutral/undefined, 1 = right leaning
 				tweet_ratio = 0
 				for noun in nouns:
 					for entry in self.politicians:
@@ -73,4 +73,4 @@ class PoliticalClassification(object):
 								tweet_ratio = -1
 								return tweet_ratio
 						else:
-							return 0
+							return tweet_ratio
